@@ -63,10 +63,30 @@ module.exports = {
         name: user.tag,
         iconURL: user.displayAvatarURL()
       })
-      .setDescription("<:Yes:1040517019147182121> **Check Your DM's**")
+      .setDescription("<:Yes:1040517019147182121> **Check Your DM's.**")
       .setTimestamp()
 
-    user.send({ embeds: [embed] });
+    
     interaction.reply({ embeds: [embed2], ephemeral: true });
+    user.send({ embeds: [embed] })
+    .catch(async (err) => {
+      console.log(err);
+      await interaction.editReply({
+        embeds: [
+          new EmbedBuilder()
+          .setColor("50C878")
+          .setAuthor({
+            name: user.tag,
+            iconURL: user.displayAvatarURL()
+          })
+          .setDescription("<:Yes:1040517019147182121> **Your Note has been saved.**")
+          .setFooter({
+            text: "Your DM's are Closed!?",
+            iconURL: user.displayAvatarURL()
+          })
+          .setTimestamp()
+        ]
+      })
+    })
   },
 };
