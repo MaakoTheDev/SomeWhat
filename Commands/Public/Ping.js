@@ -16,7 +16,7 @@ module.exports = {
      * @param {Client} client
      * @param {CommandInteraction} interaction
      */
-    execute(interaction, client) {
-        interaction.reply({ content: `🏓 **Pong! - ${client.ws.ping}ms**`})
+    async execute(interaction, client) {
+        await interaction.reply({ content: `🏓 **Pong! - ${client.ws.ping}ms**`})
     }
 };

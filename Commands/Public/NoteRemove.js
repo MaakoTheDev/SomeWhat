@@ -5,7 +5,7 @@ const {
   Client,
   EmbedBuilder,
 } = require("discord.js");
-const DB = require("../../Structures/Models/NoteDB");
+const DB = require("../../Structures/models/NoteDB");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -26,26 +26,45 @@ module.exports = {
     const user = interaction.user;
     const noteId = interaction.options.getString("note-id");
     const data = await DB.findById(noteId);
+    const userDB = await DB.findOne({
+      UserID: user.id,
+    });
+    
+    if (!userDB)
+      return interaction.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setDescription(
+              "<:No:1040517021772828683> **Error:** <:No:1040517021772828683>\n **This note doesn't belong to you.**"
+            )
+            .setColor("Red"),
+        ],
+        ephemeral: true,
+      });
 
     const error = new EmbedBuilder()
-    .setDescription(`\\📛 **Error:** \\📛\n **No Notes matching with \`${noteId}\` in my database.**`)
-    .setColor("Red")
+      .setDescription(
+        `<:No:1040517021772828683> **Error:** <:No:1040517021772828683>\n **No Notes matching with \`${noteId}\` in my database.**`
+      )
+      .setColor("Red");
 
-    if (!data) await interaction.reply({ embeds: [error], ephemeral: true });
-
+    // if (!data) return await interaction.reply({ embeds: [error], ephemeral: true });
+    if (!data) {
+      await interaction.reply({ embeds: [error], ephemeral: true });
+    }
     data.delete();
 
-    const success = new EmbedBuilder()
+      const success = new EmbedBuilder()
       .setTitle("Note Removed")
       .setColor("50C878")
       .setDescription(
         `<:Yes:1040517019147182121> **Sucessfully Removed A Note**\n**NoteID:** ${noteId}`
       )
-      .setTimestamp()
+      .setTimestamp();
 
     await interaction.reply({
       embeds: [success],
-      ephemeral: true 
-    })
+      ephemeral: true,
+    });
   },
 };

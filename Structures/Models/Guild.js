@@ -1,14 +1,15 @@
 const { Schema, model } = require('mongoose');
 
 const Guild = new Schema({
-    _id: Schema.Types.ObjectId,
+
     gID: { type: String },
     gName: { type: String },
-    gIcon: { type: String, required: false },
-    gInvite: { type: String },
-    cID: { type: String },
-    
+    modC: { type: String },
+    verifiedRole: { type: String },
+    welcomeC: { type: String },
+    leaveC: { type: String },
+    introC: { type: String },
 
 });
 
-module.exports = model("Guild", Guild, "guilds"); 
+module.exports = model("Guild", Guild, "Guild"); 

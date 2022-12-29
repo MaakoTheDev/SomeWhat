@@ -5,7 +5,7 @@ const {
   Client,
   EmbedBuilder,
 } = require("discord.js");
-const NoteSchema = require("../../Structures/Models/NoteDB");
+const NoteSchema = require("../../Structures/models/NoteDB");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -28,7 +28,7 @@ module.exports = {
     const page = interaction.options.getInteger("page");
 
     const noteData = await NoteSchema.find({
-      userId: user.id,
+      UserID: user.id
     });
 
     if (!noteData?.length)

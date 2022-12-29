@@ -4,89 +4,49 @@ const {
   PermissionFlagsBits,
   Client,
   EmbedBuilder,
+  ActionRowBuilder,
+  ChatInputCommandInteraction,
+  ModalBuilder,
+  TextInputStyle,
+  TextInputBuilder,
 } = require("discord.js");
 const ms = require("ms");
-const NoteSchema = require("../../Structures/Models/NoteDB");
-const { Types } = require("mongoose");
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("note")
-    .setDescription("Make a note.")
-    .addStringOption((option) =>
-      option
-        .setName("note-title")
-        .setDescription("Set a title for the Note your making.")
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName("note")
-        .setDescription("Set a note for your self")
-        .setRequired(true)
-    )
+    .setDescription("Create yourself a Note.")
     .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages),
   /**
+   * @param {ChatInputCommandInteraction} interaction
    * @param {Client} client
-   * @param {CommandInteraction} interaction
    */
   async execute(interaction, client) {
-    const NoteS = interaction.options.getString("note");
-    const NoteSID = interaction.options.getString("note-title");
-    const user = interaction.user;
+    const modal = new ModalBuilder()
+      .setTitle("Create a Note")
+      .setCustomId("note_modal")
 
-    const NoteDB = new NoteSchema({
-      _id: Types.ObjectId(),
-      NoteID: NoteSID,
-      Note: NoteS,
-      UserID: user.id,
-    });
+    const NoteTitleModal = new TextInputBuilder()
+      .setLabel("What's your Note Title gonna be?")
+      .setCustomId("notetitlemodal")
+      .setPlaceholder("Set a Note Title.")
+      .setRequired(true)
+      .setStyle(TextInputStyle.Short)
+      .setMinLength(1);
 
-    NoteDB.save().then(console.log);
+    const NoteTextModal = new TextInputBuilder()
+      .setLabel("What do you want to Note?")
+      .setCustomId("notetextmodal")
+      .setPlaceholder("Leave your note here...")
+      .setRequired(true)
+      .setMinLength(1)
+      .setStyle(TextInputStyle.Short);
 
-    const embed = new EmbedBuilder()
-      .setAuthor({
-        name: user.tag,
-        iconURL: user.displayAvatarURL(),
-      })
-      .setColor("2f3136")
-      .addFields(
-        { name: NoteDB.NoteID, value: `**Note:** ${NoteDB.Note}\n**NoteID:** ${NoteDB._id}` },
-        )
-      .setFooter({
-        text: "The Note Has Been Saved",
-      });
+    const actionrow1 = new ActionRowBuilder().addComponents(NoteTitleModal);
+    const actionrow2 = new ActionRowBuilder().addComponents(NoteTextModal);
 
-    const embed2 = new EmbedBuilder()
-      .setColor("50C878")
-      .setAuthor({
-        name: user.tag,
-        iconURL: user.displayAvatarURL()
-      })
-      .setDescription("<:Yes:1040517019147182121> **Check Your DM's.**")
-      .setTimestamp()
+    modal.addComponents(actionrow1, actionrow2);
 
-    
-    interaction.reply({ embeds: [embed2], ephemeral: true });
-    user.send({ embeds: [embed] })
-    .catch(async (err) => {
-      console.log(err);
-      await interaction.editReply({
-        embeds: [
-          new EmbedBuilder()
-          .setColor("50C878")
-          .setAuthor({
-            name: user.tag,
-            iconURL: user.displayAvatarURL()
-          })
-          .setDescription("<:Yes:1040517019147182121> **Your Note has been saved.**")
-          .setFooter({
-            text: "Your DM's are Closed!?",
-            iconURL: user.displayAvatarURL()
-          })
-          .setTimestamp()
-        ]
-      })
-    })
+    interaction.showModal(modal);
   },
 };
